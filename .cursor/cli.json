@@ -10,7 +10,8 @@
       "Read(.env)",
       "Read(.env.*)",
       "Write(.env)",
-      "Write(.env.*)"
+      "Write(.env.*)",
+      "Shell(*:*.env*)"
     ]
   }
 }
