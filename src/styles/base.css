@@ -1,0 +1,81 @@
+/* Global element defaults. Loaded inside Tailwind's `base` layer. */
+
+@layer base {
+  :root {
+    /* Responsive gutters / section rhythm used by `container` and `section`. */
+    --gutter: 1rem;
+    --section-y: 2rem;
+    --grid-gap: 0.5rem;
+
+    @variant md {
+      --gutter: 1.5rem;
+      --section-y: 3rem;
+      --grid-gap: 0.75rem;
+    }
+
+    @variant lg {
+      --gutter: 3rem;
+      --section-y: 4rem;
+      --grid-gap: 1rem;
+    }
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    /* No tracking on body: em-based letter-spacing inherits as a fixed px value.
+       Tracking comes from the `text-xs` / `text-base` tokens instead. */
+  }
+
+  /* Borders default to black hairlines (Tailwind default is currentColor / grey). */
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-line);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button,
+  [role="button"] {
+    cursor: pointer;
+    border-radius: 0;
+  }
+
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  ::selection {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  /* One visible, high-contrast focus ring for every interactive element. */
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

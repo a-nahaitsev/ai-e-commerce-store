@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Shell(npm:run build)",
+      "Shell(npm:run typecheck)",
+      "Shell(git:status)",
+      "Shell(git:diff*)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Write(.env)",
+      "Write(.env.*)"
+    ]
+  }
+}

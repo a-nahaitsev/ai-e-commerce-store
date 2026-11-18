@@ -1,0 +1,57 @@
+/*
+ * Design tokens (Tailwind v4 CSS-first config).
+ * Visual reference: gucci.com -- strict black/white, square corners,
+ * hairline borders, small uppercase labels, tight tracking, slow expo-out easing.
+ */
+
+@theme {
+  /* ---- Colors ---------------------------------------------------------- */
+  /* Black / white are measured from gucci.com. Greys are our own picks. */
+  --color-ink: #000000;
+  --color-paper: #ffffff;
+  --color-mute: #767676; /* secondary text, placeholders */
+  --color-line: #000000; /* default border colour */
+  --color-line-soft: #d9d9d9; /* subtle dividers */
+  --color-overlay: rgb(0 0 0 / 0.5); /* modal backdrop */
+
+  /* ---- Typography ------------------------------------------------------ */
+  /* Gucci Sans Pro is proprietary; Montserrat (loaded in layout.tsx) is the stand-in. */
+  --font-sans: var(--font-montserrat), "Helvetica Neue", Arial, sans-serif;
+
+  /* Gucci only uses two body sizes: 12px/16px and 16px/24px, both with tight tracking. */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-xs--letter-spacing: -0.03em; /* -0.36px */
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-base--letter-spacing: -0.04em; /* -0.64px */
+
+  /* ---- Radius: everything is square ----------------------------------- */
+  /* `rounded-full` is untouched and reserved for circular icon buttons. */
+  --radius-*: initial;
+  --radius-none: 0px;
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
+
+  /* ---- Breakpoints (gucci.com media queries: 480 / 768 / 1024 / 1440) -- */
+  --breakpoint-*: initial;
+  --breakpoint-sm: 30rem; /* 480px */
+  --breakpoint-md: 48rem; /* 768px */
+  --breakpoint-lg: 64rem; /* 1024px */
+  --breakpoint-xl: 90rem; /* 1440px */
+
+  /* ---- Motion ---------------------------------------------------------- */
+  --ease-gucci: cubic-bezier(0.5, 0, 0, 1);
+  --duration-ui: 500ms; /* buttons, inputs (0.5s on site) */
+  --duration-slow: 800ms; /* nav / large UI (0.8s on site) */
+
+  /* ---- Layout ---------------------------------------------------------- */
+  --container-page: 90rem; /* max content width of `container` */
+  --size-control: 3rem; /* 48px: button / nav-link / input row height */
+}

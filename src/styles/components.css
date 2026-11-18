@@ -1,0 +1,354 @@
+/*
+ * Reusable primitives. Plain class names, no per-page styling.
+ * Layout/typography helpers are `@utility` so Tailwind variants work (md:heading, hover:...).
+ * Multi-state components (buttons, links, fields) live in the `components` layer.
+ */
+
+/* ========================================================================
+ * Containers & layout
+ * ====================================================================== */
+
+/* Padded page container: responsive gutters, capped at --container-page. */
+@utility container {
+  width: 100%;
+  max-width: var(--container-page);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Full-bleed wrapper (hero images, footer bands). No padding, no max width. */
+@utility container-bleed {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+  padding-inline: 0;
+}
+
+/* Vertical rhythm between page sections. */
+@utility section {
+  padding-block: var(--section-y);
+}
+
+/* Product / editorial grid: 2 -> 3 -> 4 columns. */
+@utility grid-products {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--grid-gap);
+
+  @variant md {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @variant lg {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Inverse surface (footer, dark bands). */
+@utility surface-inverse {
+  background-color: var(--color-ink);
+  color: var(--color-paper);
+}
+
+/* Modal / drawer backdrop. */
+@utility overlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--color-overlay);
+}
+
+/* ========================================================================
+ * Typography
+ * ====================================================================== */
+
+/* 12/16 bold uppercase: nav items, button labels, footer headings. */
+@utility text-label {
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  font-weight: 700;
+  letter-spacing: -0.05em; /* -0.6px */
+  text-transform: uppercase;
+}
+
+/* 16/24 bold uppercase: section headings. */
+@utility heading {
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  font-weight: 700;
+  letter-spacing: -0.03em; /* -0.48px */
+  text-transform: uppercase;
+}
+
+/* Hero / editorial display heading. Fluid 28px -> 56px. Size is our own pick
+   (not measured from gucci.com); weight and tracking follow the site's headings. */
+@utility display {
+  font-size: clamp(1.75rem, 1rem + 3vw, 3.5rem);
+  line-height: 1.05;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+/* ========================================================================
+ * Borders
+ * ====================================================================== */
+
+@utility divider {
+  border: 0;
+  border-top: 1px solid var(--color-line);
+  margin: 0;
+}
+
+@utility divider-soft {
+  border: 0;
+  border-top: 1px solid var(--color-line-soft);
+  margin: 0;
+}
+
+/* ========================================================================
+ * Components
+ * ====================================================================== */
+
+@layer components {
+  /* ---- Panel: dialogs, cards. Square, flat, no shadow. ------------------ */
+  .panel {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    padding: 1.5rem;
+  }
+  .panel-outline {
+    border: 1px solid var(--color-line);
+  }
+  @media (width >= theme(--breakpoint-md)) {
+    .panel {
+      padding: 2rem;
+    }
+  }
+
+  /* ---- Buttons ----------------------------------------------------------
+   * 48px tall, square, 12px bold uppercase label, 1px border.
+   * Hover inverts colours (0.5s expo-out).
+   * Variants set CSS variables; `.btn` consumes them.
+   *   .btn-primary            solid black on light surfaces (default)
+   *   .btn-secondary          black outline on light surfaces
+   *   .btn-primary-inverse    solid white on dark surfaces
+   *   .btn-secondary-inverse  white outline on dark surfaces
+   *   .btn-fluid              full width below md, auto from md up
+   * -------------------------------------------------------------------- */
+  .btn {
+    --btn-bg: var(--color-ink);
+    --btn-fg: var(--color-paper);
+    --btn-bd: var(--color-ink);
+    --btn-hover-bg: var(--color-paper);
+    --btn-hover-fg: var(--color-ink);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-sizing: border-box;
+    min-height: var(--size-control);
+    padding-inline: 1.5rem;
+    border: 1px solid var(--btn-bd);
+    border-radius: 0;
+    background-color: var(--btn-bg);
+    color: var(--btn-fg);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+    font-weight: 700;
+    letter-spacing: normal;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+    user-select: none;
+    transition-property: background-color, color, border-color, opacity;
+    transition-duration: var(--duration-ui);
+    transition-timing-function: var(--ease-gucci);
+  }
+  .btn:hover:not(:disabled, [aria-disabled="true"]) {
+    background-color: var(--btn-hover-bg);
+    color: var(--btn-hover-fg);
+  }
+  .btn:disabled,
+  .btn[aria-disabled="true"] {
+    opacity: 0.4;
+  }
+
+  .btn-primary {
+    /* defaults on .btn already match; class kept for explicit intent */
+    --btn-bg: var(--color-ink);
+    --btn-fg: var(--color-paper);
+    --btn-bd: var(--color-ink);
+    --btn-hover-bg: var(--color-paper);
+    --btn-hover-fg: var(--color-ink);
+  }
+  .btn-secondary {
+    --btn-bg: transparent;
+    --btn-fg: var(--color-ink);
+    --btn-bd: var(--color-ink);
+    --btn-hover-bg: var(--color-ink);
+    --btn-hover-fg: var(--color-paper);
+  }
+  .btn-primary-inverse {
+    --btn-bg: var(--color-paper);
+    --btn-fg: var(--color-ink);
+    --btn-bd: var(--color-paper);
+    --btn-hover-bg: transparent;
+    --btn-hover-fg: var(--color-paper);
+  }
+  .btn-secondary-inverse {
+    --btn-bg: transparent;
+    --btn-fg: var(--color-paper);
+    --btn-bd: var(--color-paper);
+    --btn-hover-bg: var(--color-paper);
+    --btn-hover-fg: var(--color-ink);
+  }
+
+  .btn-fluid {
+    width: 100%;
+  }
+  @media (width >= theme(--breakpoint-md)) {
+    .btn-fluid {
+      width: auto;
+    }
+  }
+
+  /* Circular icon-only button (e.g. modal close). 24px glyph, 48px target. */
+  .btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--size-control);
+    height: var(--size-control);
+    padding: 0;
+    border: 0;
+    border-radius: 9999px;
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+    transition: opacity var(--duration-ui) var(--ease-gucci);
+  }
+  .btn-icon:hover {
+    opacity: 0.7;
+  }
+
+  /* ---- Links ------------------------------------------------------------
+   *   .link            12/16 medium, plain; underline on hover (footer, meta)
+   *   .link-underline  always underlined (inline legal / "Cookie Policy")
+   *   .link-nav        48px tall bold uppercase nav item (16px 24px padding)
+   *   .link-cta        16/24 medium editorial call-to-action ("Explore Options")
+   * -------------------------------------------------------------------- */
+  .link {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+    font-weight: 500;
+    letter-spacing: var(--text-xs--letter-spacing);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    transition: text-decoration-color var(--duration-ui) var(--ease-gucci);
+  }
+  .link:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .link-underline {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    font-weight: 700;
+    transition: opacity var(--duration-ui) var(--ease-gucci);
+  }
+  .link-underline:hover {
+    opacity: 0.6;
+  }
+
+  .link-nav {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--size-control);
+    padding-inline: 1.5rem;
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+    font-weight: 700;
+    letter-spacing: normal;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: opacity var(--duration-slow) var(--ease-gucci);
+  }
+  .link-nav:hover {
+    opacity: 0.6;
+  }
+
+  .link-cta {
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    transition: opacity var(--duration-ui) var(--ease-gucci);
+  }
+  .link-cta:hover {
+    opacity: 0.6;
+  }
+
+  /* ---- Form field: underline-only input ---------------------------------
+   * Transparent, square, 1px bottom border; thickens on focus (no ring).
+   * Use `.field-inverse` on dark surfaces.
+   * -------------------------------------------------------------------- */
+  .field {
+    display: block;
+    width: 100%;
+    min-height: var(--size-control);
+    padding: 1rem 0 0.5rem;
+    border: 0;
+    border-bottom: 1px solid var(--color-line);
+    border-radius: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: var(--text-base);
+    line-height: 1rem;
+    letter-spacing: var(--text-base--letter-spacing);
+    outline: none;
+    box-shadow: 0 0 0 0 var(--color-line);
+    transition: box-shadow var(--duration-ui) var(--ease-gucci);
+  }
+  .field::placeholder {
+    color: var(--color-mute);
+    opacity: 1;
+  }
+  .field:focus-visible {
+    outline: none;
+    box-shadow: 0 1px 0 0 var(--color-line); /* 1px border + 1px shadow = 2px */
+  }
+  .field-inverse {
+    border-bottom-color: var(--color-paper);
+    color: var(--color-paper);
+    box-shadow: 0 0 0 0 var(--color-paper);
+  }
+  .field-inverse:focus-visible {
+    box-shadow: 0 1px 0 0 var(--color-paper);
+  }
+
+  /* ---- Skip link (first focusable element on the page) ---------------- */
+  .skip-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    padding: 1rem 1.5rem;
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+    font-weight: 700;
+    letter-spacing: normal;
+    text-transform: uppercase;
+    transform: translateY(-100%);
+  }
+  .skip-link:focus-visible {
+    transform: translateY(0);
+    outline-color: var(--color-paper);
+    outline-offset: -4px;
+  }
+}

@@ -1,0 +1,58 @@
+# CLAUDE.md
+
+@AGENTS.md
+
+## Project
+
+E-commerce store built with Next.js (App Router), TypeScript, Tailwind CSS v4, Better Auth, Drizzle ORM and Postgres on Neon.
+
+Current state: scaffold plus a static homepage and a product detail page (`/products/[slug]`), with products, categories and stock read from Postgres (Drizzle) and the rest of the content from `src/data/catalog.ts` (Unsplash images). The homepage "New Arrivals" grid doubles as the product listing; there is no dedicated listing page yet. The only database tables are `categories`, `products` and `product_stock`. There are no auth flows, cart/checkout (so no add-to-bag button), payments or deployment config yet, and most other links are `#` placeholders. Don't add them unless asked.
+
+## Commands
+
+- `npm run dev` – start dev server (Turbopack)
+- `npm run build` / `npm run start` – production build / serve
+- `npm run lint` – ESLint
+- `npm run typecheck` – `tsc --noEmit`
+- `npm run db:generate` – generate Drizzle migrations from `src/db/schema/`
+- `npm run db:migrate` – apply migrations
+- `npm run db:push` – push schema straight to the database (dev)
+- `npm run db:seed` – load the sample catalogue (idempotent upsert; resets sample rows)
+- `npm run db:studio` – Drizzle Studio
+
+Run `npm run typecheck && npm run lint` after changes. `npm run build` needs `DATABASE_URL` set (`src/db/index.ts` throws without it) and a migrated, seeded database, because `generateStaticParams` reads product slugs from it.
+
+## Layout
+
+- `src/app/` – routes (App Router)
+- `src/app/api/auth/[...all]/route.ts` – Better Auth handler
+- `src/app/products/[slug]/` – product detail page (`page.tsx`, `loading.tsx`). Prerendered via `generateStaticParams`; unknown slugs call `notFound()` (branded `src/app/not-found.tsx`). `loading.tsx` is required: with `cacheComponents`, `await params` must sit under a Suspense boundary.
+- `src/components/` – shared UI (site header/footer, product card, section heading, product gallery, stock status, disclosure)
+- `src/data/catalog.ts` – static content only (site config, nav, hero, collections, editorial, services, footer). No products.
+- `src/lib/format.ts` (`formatPrice`) and `src/lib/stock.ts` (`getStockStatus`: in stock / "Only N left" at ≤ 5 / out of stock, plus schema.org availability)
+- `src/styles/` – design system (Gucci-inspired): `theme.css` tokens, `base.css`, `components.css` (`btn-*`, `link-*`, `field`, `container`, `grid-products`, `display`, ...). Imported by `src/app/globals.css`. Prefer these primitives over ad-hoc utilities.
+- `src/db/index.ts` – Drizzle client (Neon HTTP driver, `drizzle-orm/neon-http`)
+- `src/db/schema/` – table definitions; re-export every table from `index.ts`. `categories` 1–N `products` 1–1 `product_stock`.
+- `src/db/queries/products.ts` – cached read queries (`getProducts`, `getProductBySlug`, `getRelatedProducts`, `getProductSlugs`) returning the UI `Product` type from `src/lib/product.ts`
+- `src/db/seed.ts` + `seed-data.ts` – sample catalogue (add a product here with `defineProduct({ photo, detailFocus, ... })`, prices in cents); `load-env.ts` must be the first import in standalone scripts
+- `drizzle/` – generated SQL migrations (commit them)
+- `src/lib/auth.ts` – Better Auth server instance (Drizzle adapter, `nextCookies` plugin last)
+- `src/lib/auth-client.ts` – Better Auth React client
+- `drizzle.config.ts` – Drizzle Kit config; loads `.env.local` then `.env`
+
+## Conventions
+
+- Use the `@/*` alias for imports from `src/`.
+- Remote images must come from a host allowed in `next.config.ts` (`images.remotePatterns`; currently `images.unsplash.com`). Use `preload` (not the deprecated `priority`) on the above-the-fold image. Only use stock photos with no visible third-party logos or brand text.
+- With `cacheComponents` on, don't call `new Date()` / `Date.now()` in server components during prerender.
+- Server-only code (`@/db`, `@/lib/auth`) must not be imported from client components; use `@/lib/auth-client` there.
+- Keep `nextCookies()` as the last Better Auth plugin.
+- Database: products are addressed by `slug` (URL key); prices are integer cents (`formatPrice` takes cents); stock is a separate `product_stock.quantity` row (0 = sold out, never negative). Categories are flat (one per product). Product images and details live on the product row (`gallery` is jsonb); no variants yet.
+- Schema changes: edit `src/db/schema/`, then `npm run db:generate` and `npm run db:migrate` (commit the SQL in `drizzle/`). Use `db:push` only for throwaway experiments.
+- Product queries live in a module with a file-level `"use cache"` (all exports async, `cacheLife` + `cacheTag("products")`). After writing products or stock, call `updateTag("products")`. The Neon HTTP driver has no interactive transactions; stock decrements need an atomic `UPDATE ... WHERE quantity >= n`.
+- Better Auth tables (user, session, account, verification) are not generated yet. Create them with `npx @better-auth/cli generate` into `src/db/schema/`, then `npm run db:push`.
+- Next.js config enables `cacheComponents` and `partialPrefetching`. Check `node_modules/next/dist/docs/` before using caching or dynamic APIs.
+
+## Environment
+
+Copy `.env.example` to `.env.local`. Variables: `DATABASE_URL` (Neon), `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `NEXT_PUBLIC_APP_URL`. Never commit real env files; only `.env.example` is tracked.
